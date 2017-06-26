@@ -1,3 +1,11 @@
+enum ArrayError: Error {
+    case indexOutOfRange
+}
+
+enum ItemError: Error {
+    case zeroQuantity
+}
+
 protocol Discountable {
     func getDiscountAmount() -> Double
 }
@@ -24,10 +32,13 @@ class Item: Discountable {
         }
     }
     
-    init(name: String, price: Double, quantity: Int) {
+    init(name: String, price: Double, quantity: Int) throws {
+        guard quantity > 0 else {
+            throw ItemError.zeroQuantity
+        }
+        
         self.name = name
         self.price = price
-        assert(quantity > 0)
         self.quantity = quantity
     }
     
@@ -94,12 +105,12 @@ class Order {
         }
     }
     
-    func removeItem(at index: Int) {
-        if items.indices.contains(index) {
-            items.remove(at: index)
-        } else {
-            //throw exception
+    func removeItem(at index: Int) throws {
+        guard items.indices.contains(index) else {
+            throw ArrayError.indexOutOfRange
         }
+        
+        items.remove(at: index)
     }
     
     func showOrder() {
@@ -115,10 +126,11 @@ class Order {
     }
 }
 
-let item1 = Item(name: "iPhone 7", price: 649, quantity: 1)
-let item2 = Item(name: "iPhone 7", price: 649, quantity: 1)
-let item3 = Item(name: "Macbook Pro 13-inch", price: 1299, quantity: 5)
-let item4 = Item(name: "Apple Watch Series 2", price: 269, quantity: 1)
+let item1 = try! Item(name: "iPhone 7", price: 649, quantity: 1)
+let item2 = try! Item(name: "iPhone 7", price: 649, quantity: 1)
+let item3 = try! Item(name: "Macbook Pro 13-inch", price: 1299, quantity: 5)
+let item4 = try! Item(name: "Apple Watch Series 2", price: 269, quantity: 1)
+
 let order1 = Order()
 order1.addItem(item1)
 order1.addItem(item2)
@@ -128,11 +140,12 @@ order1.showOrder()
 
 print()
 
-let f1 = Item(name: "Apple", price: 0.53, quantity: 10)
+let f1 = try! Item(name: "Apple", price: 0.53, quantity: 10)
 let f2 = f1
-let f3 = Item(name: "Watermelon", price: 2.57, quantity: 4)
-let f4 = Item(name: "Banana", price: 1.48, quantity: Int.max) //discount not included
+let f3 = try! Item(name: "Watermelon", price: 2.57, quantity: 4)
+let f4 = try! Item(name: "Banana", price: 1.48, quantity: Int.max) //discount not included
+
 let fruits = [f1, f2, f3, f4]
 let order2 = Order(items: fruits)
-order2.removeItem(at: 1)
+try! order2.removeItem(at: 1)
 order2.showOrder()
