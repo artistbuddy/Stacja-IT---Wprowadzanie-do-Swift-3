@@ -10,9 +10,7 @@ protocol Figure {
 class Circle: Figure {
     let radius: Double
     var diameter: Double {
-        get {
-            return radius * 2
-        }
+        return radius * 2
     }
     
     init(radius: Double) throws {
@@ -102,9 +100,7 @@ class Rectangle: Figure {
 
 class Square: Rectangle {
     var diagonal: Double {
-        get {
-            return sideA * 2.squareRoot()
-        }
+        return sideA * 2.squareRoot()
     }
     
     init(width: Double) throws {
