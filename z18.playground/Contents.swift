@@ -1,3 +1,7 @@
+enum DimensionError: Error {
+    case fictitiousSize
+}
+
 protocol Figure {
     func getPerimeter() -> Double
     func getArea() -> Double
@@ -11,9 +15,9 @@ class Circle: Figure {
         }
     }
     
-    init?(radius: Double) {
+    init(radius: Double) throws {
         guard radius > 0 else {
-            return nil
+            throw DimensionError.fictitiousSize
         }
         
         self.radius = radius
@@ -35,9 +39,9 @@ class Triangle: Figure {
         var altitude: Double
 //        let angle: Double
         
-        init?(side: Double, altitude: Double) {
+        init(side: Double, altitude: Double) throws {
             guard side > 0, altitude > 0 else {
-                return nil
+                throw DimensionError.fictitiousSize
             }
             
             self.side = side
@@ -49,7 +53,7 @@ class Triangle: Figure {
     let b: Properties
     let c: Properties
     
-    init?(a: Properties, b: Properties, c: Properties) {
+    init(a: Properties, b: Properties, c: Properties) {
         self.a = a
         self.b = b
         self.c = c
@@ -66,10 +70,9 @@ class Triangle: Figure {
 }
 
 class Equilateral: Triangle {
-    init?(side: Double, altitude: Double) {
-        guard let property = Properties(side: side, altitude: altitude) else {
-            return nil
-        }
+    init(side: Double, altitude: Double) throws {
+        let property = try Properties(side: side, altitude: altitude)
+        
         super.init(a: property, b: property, c: property)
     }
 }
@@ -78,9 +81,9 @@ class Rectangle: Figure {
     let sideA: Double
     let sideB: Double
     
-    init?(width: Double, height: Double) {
+    init(width: Double, height: Double) throws {
         guard width > 0, height > 0 else {
-            return nil
+            throw DimensionError.fictitiousSize
         }
         
         self.sideA = width
@@ -104,27 +107,38 @@ class Square: Rectangle {
         }
     }
     
-    init?(width: Double) {
-        super.init(width: width, height: width)
+    init(width: Double) throws {
+        try super.init(width: width, height: width)
     }
 }
 
-if let figure = Square(width: 10.0) {
+if let figure = try? Square(width: 10.0) {
     print("Square")
     print(figure.getArea())
     print(figure.getPerimeter())
 }
 
-if let figure = Equilateral(side: 10.0, altitude: 5.0) {
+if let figure = try? Equilateral(side: 10.0, altitude: 5.0) {
     print("Equilateral triangle")
     print(figure.getArea())
     print(figure.getPerimeter())
 }
 
-if let figure = Circle(radius: 10.0) {
+if let figure = try? Circle(radius: 10.0) {
     print("Circle")
     print(figure.getArea())
     print(figure.getPerimeter())
+}
+
+do {
+    let figure = try Rectangle(width: -5.0, height: 5.0)
+    print("Imposible rectangle")
+    print(figure.getArea())
+    print(figure.getPerimeter())
+} catch let error as DimensionError {
+    switch error {
+    case .fictitiousSize: print("Rozmiar musi być większy niż 0")
+    }
 }
 
 
