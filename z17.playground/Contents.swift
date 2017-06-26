@@ -14,6 +14,7 @@ struct Rectangle {
     }
     
     init(width: Double, height: Double) {
+        assert(width > 0.0 && height > 0.0)
         self.width = width
         self.height = height
     }
